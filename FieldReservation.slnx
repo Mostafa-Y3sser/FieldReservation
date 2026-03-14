@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="FieldReservation.API/FieldReservation.API.csproj" />
+  <Project Path="FieldReservation.Application/FieldReservation.Application.csproj" />
+  <Project Path="FieldReservation.Domain/FieldReservation.Domain.csproj" />
+  <Project Path="FieldReservation.Infrastructure/FieldReservation.Infrastructure.csproj" />
+</Solution>
