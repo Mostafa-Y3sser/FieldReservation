@@ -11,6 +11,6 @@ namespace FieldReservation.Application.Auth.Commands.Login
         public Task<Result<AuthResponseDto>> Handle(
             LoginCommand command,
             CancellationToken cancellationToken)
-            => authService.LoginAsync(command.Email, command.Password, cancellationToken);
+            => authService.LoginAsync(command.Email, command.Password);
     }
 }

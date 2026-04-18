@@ -1,4 +1,4 @@
-﻿namespace FieldReservation.Domain.Entities
+namespace FieldReservation.Domain.Entities
 {
     public class RefreshToken : BaseEntity
     {
@@ -8,6 +8,6 @@
         public DateTime? RevokedOn { get; set; }
 
         public string UserId { get; set; } = string.Empty;
-        public ApplicationUser? User { get; set; }
+        public ApplicationUser User { get; set; } = null!;
     }
 }

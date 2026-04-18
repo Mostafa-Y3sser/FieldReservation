@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using FieldReservation.Application.Common.Results;
 
 namespace FieldReservation.API.Common
@@ -6,49 +7,69 @@ namespace FieldReservation.API.Common
     [ApiController]
     public abstract class BaseApiController : ControllerBase
     {
-        protected IActionResult MapErrors(IReadOnlyList<Error> errors)
+        protected IActionResult HandleResult(Result result)
         {
+            if (result.IsSucceeded)
+                return Ok();
+            else
+                return HandleErrors(result.Errors);
+
+        }
+        protected ActionResult HandleResult<TValue>(Result<TValue> result)
+        {
+            if (result.IsSucceeded)
+                return Ok(result.Value);
+            else
+                return HandleErrors(result.Errors);
+        }
+        private ActionResult HandleErrors(IReadOnlyList<Error> errors)
+        {
+
+
             if (errors.Count == 0)
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An UnExpected Error Occurred");
+            else if (errors.All(error => error.Type == ErrorType.Validation))
+                return HandleValidatioErrors(errors);
+            else
+                return HandleSingleError(errors[0]);
 
-            var firstError = errors[0];
-
-            var statusCode = firstError.Type switch
-            {
-                ErrorType.NotFound => StatusCodes.Status404NotFound,
-                ErrorType.Validation => StatusCodes.Status400BadRequest,
-                ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
-                ErrorType.Forbidden => StatusCodes.Status403Forbidden,
-                ErrorType.InvalidCredentials => StatusCodes.Status401Unauthorized,
-                _ => StatusCodes.Status500InternalServerError
-            };
-
-            var problem = new ProblemDetails
-            {
-                Title = GetTitle(firstError.Type),
-                Status = statusCode,
-                Detail = firstError.Type == ErrorType.Validation
-                    ? "One or more validation errors occurred."
-                    : firstError.Description
-            };
-
-            problem.Extensions["errors"] = errors
-                .GroupBy(e => e.Code)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(e => e.Description).ToArray());
-
-            return StatusCode(statusCode, problem);
         }
 
-        private static string GetTitle(ErrorType type) => type switch
+        private ActionResult HandleValidatioErrors(IReadOnlyList<Error> errors)
         {
-            ErrorType.Validation => "Validation Failed",
-            ErrorType.NotFound => "Resource Not Found",
-            ErrorType.Unauthorized => "Unauthorized",
-            ErrorType.Forbidden => "Forbidden",
-            ErrorType.InvalidCredentials => "Invalid Credentials",
-            _ => "Server Error"
-        };
+            var modelState = new ModelStateDictionary();
+            foreach (var error in errors)
+            {
+                modelState.AddModelError(error.Code, error.Description);
+            }
+            return ValidationProblem(modelState);
+        }
+        private ActionResult HandleSingleError(Error error)
+        {
+            return Problem
+                (
+                    title: error.Code,
+                    type: error.Type.ToString(),
+                    detail: error.Description,
+                    instance: Request.Path,
+                    statusCode: GetStatusCodeByErrorType(error.Type)
+                );
+        }
+
+
+        private int GetStatusCodeByErrorType(ErrorType errorType)
+        {
+            return errorType switch
+            {
+                ErrorType.Validation => StatusCodes.Status400BadRequest,
+                ErrorType.NotFound => StatusCodes.Status404NotFound,
+                ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+                ErrorType.InvalidCredentials => StatusCodes.Status401Unauthorized,
+                ErrorType.Forbidden => StatusCodes.Status403Forbidden,
+                ErrorType.Failure => StatusCodes.Status500InternalServerError,
+                _ => StatusCodes.Status500InternalServerError
+
+            };
+        }
     }
 }

@@ -22,9 +22,11 @@ public class ReservationsController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return result.IsSucceeded
-            ? CreatedAtAction(nameof(GetById), new { id = result.Value, version = "1.0" }, result.Value)
-            : MapErrors(result.Errors);
+        
+        if (!result.IsSucceeded)
+            return HandleResult<Guid>(result);
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Value, version = "1.0" }, result.Value);
     }
 
     /// <summary>Gets a reservation by ID.</summary>
@@ -34,7 +36,7 @@ public class ReservationsController(ISender sender) : BaseApiController
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetReservationQuery(id), cancellationToken);
-        return result.IsSucceeded ? Ok(result.Value) : MapErrors(result.Errors);
+        return HandleResult<ReservationResponse>(result);
     }
 }
 

@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Asp.Versioning;
 using Microsoft.OpenApi;
 using FieldReservation.API.Middlewares;
 using FieldReservation.Application.Extentions;
 using FieldReservation.Infrastructure.Extensions;
+using FieldReservation.Infrastructure.Persistence.Seeding;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,10 +27,24 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "FieldReservation API", Version = "v1" });
 });
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddFixedWindowLimiter("auth", options =>
+    {
+        options.AutoReplenishment = true;
+        options.PermitLimit = 5;
+        options.QueueLimit = 0;
+        options.Window = TimeSpan.FromMinutes(15);
+    });
+});
+
 var app = builder.Build();
+
+// Seed Database
+await DbInitializer.SeedAsync(app.Services);
 
 if (app.Environment.IsDevelopment())
 {
@@ -39,9 +55,15 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseDeveloperExceptionPage();
+
+app.UseMiddleware<GlobalExceptionHandler>();
+
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

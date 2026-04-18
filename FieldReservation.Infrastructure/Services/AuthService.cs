@@ -12,6 +12,7 @@ using FieldReservation.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.Google;
 using FieldReservation.Application.Common.Results;
 using FieldReservation.Application.Common.Interfaces;
+using FieldReservation.Application.Common.Constants;
 
 namespace FieldReservation.Infrastructure.Services
 {
@@ -20,7 +21,7 @@ namespace FieldReservation.Infrastructure.Services
        IHttpContextAccessor httpContextAccessor, ITokenService tokenService, IOptions<JwtSettings> jwtOptions) : IAuthService
     {
         public async Task<Result<AuthResponseDto>> RegisterAsync(string firstName, string lastName, string email, string phoneNumber,
-            string password, string confirmPassword, CancellationToken cancellationToken = default)
+            string password, string confirmPassword)
         {
             if (await userManager.FindByEmailAsync(email) is not null)
                 return Error.Validation(description: "User with this email already exist.");
@@ -31,6 +32,7 @@ namespace FieldReservation.Infrastructure.Services
                 UserName = email[..email.IndexOf('@')],
                 Email = email,
                 PhoneNumber = phoneNumber,
+                CreatedAt = DateTime.UtcNow
             };
 
             var identityResult = await userManager.CreateAsync(user, password);
@@ -38,13 +40,14 @@ namespace FieldReservation.Infrastructure.Services
             if (!identityResult.Succeeded)
                 return Error.Validation(description: string.Join(", ", identityResult.Errors.Select(e => e.Description).ToList()));
 
-            // Handle rule creation later when we have roles and permissions in place
+            await userManager.AddToRoleAsync(user, Roles.Player);
+
+            await SendEmailVerificationTokenAsync(user.Email);
 
             return await generateAuthResponseAsync(user);
         }
 
-        public async Task<Result<AuthResponseDto>> LoginAsync(string email, string password,
-            CancellationToken cancellationToken = default)
+        public async Task<Result<AuthResponseDto>> LoginAsync(string email, string password)
         {
             var user = await userManager.FindByEmailAsync(email);
 
@@ -58,7 +61,7 @@ namespace FieldReservation.Infrastructure.Services
                 .CheckPasswordSignInAsync(user, password, lockoutOnFailure: true);
 
             if (!signInResult.Succeeded)
-                return Error.InvalidCredentials("Auth.InvalidCredentials", "Email or Password is incorrect.");
+                return Error.InvalidCredentials(description: "Email or Password is incorrect.");
 
             return await generateAuthResponseAsync(user);
         }
@@ -72,7 +75,7 @@ namespace FieldReservation.Infrastructure.Services
             string token = await userManager.GenerateEmailConfirmationTokenAsync(user);
             string encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-            string emailVerificationLink = $"https://FieldReservation.com/email-verification?email={email}&token={encodedToken}";
+            string emailVerificationLink = $"https://Hagz.com/email-verification?email={email}&token={encodedToken}";
             string htmlBody = emailVerificationHtmlBody(emailVerificationLink);
 
             await emailService.SendEmailAsync(email, "Hagz - Email Verification", htmlBody);
@@ -107,7 +110,7 @@ namespace FieldReservation.Infrastructure.Services
             string token = await userManager.GeneratePasswordResetTokenAsync(user);
             string encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-            string forgotPasswordLink = $"https://FieldReservation.com/reset-password?email={email}&token={encodedToken}";
+            string forgotPasswordLink = $"https://Hagz.com/reset-password?email={email}&token={encodedToken}";
             string htmlBody = forgetPasswordHtmlBody(forgotPasswordLink);
 
             await emailService.SendEmailAsync(email, "Hagz - Reset Password", htmlBody);
@@ -163,10 +166,11 @@ namespace FieldReservation.Infrastructure.Services
 
             ApplicationUser newUser = new()
             {
-                UserName = payload.Email.Split('@')[0],
+                UserName = payload.Email[..payload.Email.IndexOf('@')],
                 Email = payload.Email,
                 EmailConfirmed = true,
-                FullName = payload.Name
+                FullName = payload.Name,
+                CreatedAt = DateTime.UtcNow
             };
 
             IdentityResult result = await userManager.CreateAsync(newUser);

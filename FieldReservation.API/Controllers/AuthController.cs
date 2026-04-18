@@ -1,7 +1,10 @@
+using MediatR;
+using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using FieldReservation.API.Common;
 using FieldReservation.Application.Auth.Commands.Login;
+using Microsoft.AspNetCore.Authorization;
 using FieldReservation.Application.Auth.Commands.Register;
-using Asp.Versioning;
 using FieldReservation.Application.Auth.Commands.EmailVerification;
 using FieldReservation.Application.Auth.Commands.ForgotPassword;
 using FieldReservation.Application.Auth.Commands.GoogleSignIn;
@@ -10,17 +13,17 @@ using FieldReservation.Application.Auth.Commands.RefreshToken;
 using FieldReservation.Application.Auth.Commands.ResetPassword;
 using FieldReservation.Application.Auth.Commands.RevokeRefreshToken;
 using FieldReservation.Application.Auth.Commands.SendEmailVerificationToken;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using FieldReservation.Application.Auth.Dtos;
 
 namespace FieldReservation.API.Controllers;
 
 [Route("api/v{version:apiVersion}/[controller]")]
 [ApiVersion("1.0")]
-[AllowAnonymous]
+[EnableRateLimiting("auth")]
 public class AuthController(ISender sender) : BaseApiController
 {
+    [AllowAnonymous]
     [HttpPost("register")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -29,9 +32,10 @@ public class AuthController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return result.IsSucceeded ? Ok(result.Value) : MapErrors(result.Errors);
+        return HandleResult<AuthResponseDto>(result);
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -40,9 +44,10 @@ public class AuthController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return result.IsSucceeded ? Ok(result.Value) : MapErrors(result.Errors);
+        return HandleResult<AuthResponseDto>(result);
     }
 
+    [AllowAnonymous]
     [HttpPost("send-email-verification-token")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -51,9 +56,10 @@ public class AuthController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return result.IsSucceeded ? Ok() : MapErrors(result.Errors);
+        return HandleResult(result);
     }
 
+    [AllowAnonymous]
     [HttpPost("email-verification")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -62,9 +68,10 @@ public class AuthController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return result.IsSucceeded ? Ok(result.Value) : MapErrors(result.Errors);
+        return HandleResult<AuthResponseDto>(result);
     }
 
+    [AllowAnonymous]
     [HttpPost("forgot-password")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -73,9 +80,10 @@ public class AuthController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return result.IsSucceeded ? Ok() : MapErrors(result.Errors);
+        return HandleResult(result);
     }
 
+    [AllowAnonymous]
     [HttpPost("reset-password")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -84,9 +92,10 @@ public class AuthController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return result.IsSucceeded ? Ok() : MapErrors(result.Errors);
+        return HandleResult(result);
     }
 
+    [AllowAnonymous]
     [HttpPost("google-signin")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -95,9 +104,10 @@ public class AuthController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return result.IsSucceeded ? Ok(result.Value) : MapErrors(result.Errors);
+        return HandleResult<AuthResponseDto>(result);
     }
 
+    [AllowAnonymous]
     [HttpPost("google-signup")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -106,9 +116,10 @@ public class AuthController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return result.IsSucceeded ? Ok(result.Value) : MapErrors(result.Errors);
+        return HandleResult<AuthResponseDto>(result);
     }
 
+    [AllowAnonymous]
     [HttpPost("refresh-token")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -117,11 +128,11 @@ public class AuthController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return result.IsSucceeded ? Ok(result.Value) : MapErrors(result.Errors);
+        return HandleResult<AuthResponseDto>(result);
     }
 
-    [HttpPost("revoke-refresh-token")]
     [Authorize]
+    [HttpPost("revoke-refresh-token")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RevokeRefreshToken(
@@ -129,6 +140,6 @@ public class AuthController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return result.IsSucceeded ? Ok() : MapErrors(result.Errors);
+        return HandleResult(result);
     }
 }
