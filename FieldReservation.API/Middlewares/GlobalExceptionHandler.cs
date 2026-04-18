@@ -1,56 +1,46 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Diagnostics;
 using FieldReservation.Domain.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace FieldReservation.API.Middlewares
 {
-    public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
-        : IExceptionHandler
+    public class GlobalExceptionHandler(RequestDelegate next, ILogger<GlobalExceptionHandler> logger,
+        IHostEnvironment env)
     {
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception,
+
+        public async Task InvokeAsync(HttpContext context)
+        {
+            try
+            {
+                await next(context);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                await HandleExceptionAsync(context, ex, default!);
+            }
+        }
+
+        public async Task HandleExceptionAsync(HttpContext context, Exception exception,
             CancellationToken cancellationToken)
         {
-            logger.LogError(exception, "An unexpected error occurred.");
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode =StatusCodes.Status500InternalServerError;
 
-            if (exception is EmailSendingException emailEx)
-            {
-                var emailProblem = new ProblemDetails
-                {
-                    Title = "Email Sending Failed",
-                    Status = StatusCodes.Status500InternalServerError,
-                    Detail = emailEx.Message
-                };
-
-                httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await httpContext.Response.WriteAsJsonAsync(emailProblem, cancellationToken);
-                return true;
-            }
-
-            if (exception is InvalidOperationException operationEx)
-            {
-                var resultProblem = new ProblemDetails
-                {
-                    Title = "Invalid Result Operation",
-                    Status = StatusCodes.Status500InternalServerError,
-                    Detail = operationEx.Message
-                };
-
-                httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await httpContext.Response.WriteAsJsonAsync(resultProblem, cancellationToken);
-                return true;
-            }
+            string detail = env.IsDevelopment()
+                ? exception.Message : "An unexpected error occurred";
 
             var problem = new ProblemDetails
             {
-                Title = "Server Error",
+                Title = "Internal Server Error",
                 Status = StatusCodes.Status500InternalServerError,
-                Detail = "An unexpected error occurred. Please try again later."
+                Detail =detail,
+                Instance = context.Request.Path
             };
 
-            httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await httpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
-
-            return true;
+            await context.Response.WriteAsJsonAsync(problem, cancellationToken);
         }
     }
 }

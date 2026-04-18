@@ -12,6 +12,6 @@ namespace FieldReservation.Application.Auth.Commands.Register
             RegisterCommand request,
             CancellationToken cancellationToken)
             => authService.RegisterAsync(request.FirstName, request.LastName, request.Email, request.PhoneNumber,
-                request.Password, request.ConfirmPassword, cancellationToken);
+                request.Password, request.ConfirmPassword);
     }
 }

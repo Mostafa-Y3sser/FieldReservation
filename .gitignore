@@ -364,3 +364,11 @@ FodyWeavers.xsd
 
 # Local config (not pushed)
 .agents/
+
+.agent/
+
+.specify/
+
+PLAN.md
+
+specs/

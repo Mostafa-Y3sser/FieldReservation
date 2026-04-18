@@ -6,9 +6,9 @@ namespace FieldReservation.Application.Common.Interfaces
     public interface IAuthService
     {
         Task<Result<AuthResponseDto>> RegisterAsync(string firstName, string lastName, string email, string phoneNumber,
-            string password, string ConfirmPassword, CancellationToken cancellationToken = default);
+            string password, string ConfirmPassword);
 
-        Task<Result<AuthResponseDto>> LoginAsync(string email, string password, CancellationToken cancellationToken = default);
+        Task<Result<AuthResponseDto>> LoginAsync(string email, string password);
 
         Task<Result> SendEmailVerificationTokenAsync(string email);
         Task<Result<AuthResponseDto>> EmailVerificationAsync(string email, string token);

@@ -25,10 +25,10 @@ namespace FieldReservation.Application.Auth.Commands.Register
                 .EmailAddress().WithMessage("Invalid email format.")
                 .Must(x => x.EndsWith("@gmail.com")).WithMessage("Only Gmail addresses are allowed.");
 
-            RuleFor(x => x)
+            RuleFor(x => x.PhoneNumber)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty().WithMessage("Phone number is required.")
-                .Must(x => beValidPhoneNumber(x.PhoneNumber)).WithMessage("Invalid phone number format.");
+                .Must(beValidPhoneNumber).WithMessage("Invalid phone number format.");
 
             RuleFor(x => x.Password)
                 .Cascade(CascadeMode.Stop)
@@ -38,6 +38,11 @@ namespace FieldReservation.Application.Auth.Commands.Register
                 .Matches("[A-Z]").WithMessage("Password must contain at least one uppercase letter.")
                 .Matches("[0-9]").WithMessage("Password must contain at least one digit.")
                 .Matches("[^a-zA-Z0-9]").WithMessage("Password must contain at least one non-alphanumeric character.");
+
+            RuleFor(x => x.ConfirmPassword)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty().WithMessage("Confirm password is required.")
+                .Equal(x => x.Password).WithMessage("Password and Confirm Password do not match.");
         }
 
         private bool beValidPhoneNumber(string phoneNumber)
