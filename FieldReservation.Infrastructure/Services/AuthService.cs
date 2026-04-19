@@ -261,7 +261,7 @@ namespace FieldReservation.Infrastructure.Services
                 user.Email!,
                 await tokenService.CreateAccessTokenAsync(user),
                 await tokenService.CreateRefreshTokenAsync(user.Id),
-                DateTime.UtcNow.AddMinutes(jwtOptions.Value.AccessTokenExpirationMinutes)
+                DateTime.Now.AddMinutes(jwtOptions.Value.AccessTokenExpirationMinutes)
             );
         private string emailVerificationHtmlBody(string emailVerificationLink) =>
            $@"
