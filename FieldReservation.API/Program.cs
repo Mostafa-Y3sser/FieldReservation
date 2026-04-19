@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.RateLimiting;
-using Asp.Versioning;
 using Microsoft.OpenApi;
 using FieldReservation.API.Middlewares;
 using FieldReservation.Application.Extentions;
@@ -12,12 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-builder.Services.AddApiVersioning(options =>
-{
-    options.DefaultApiVersion = new ApiVersion(1, 0);
-    options.AssumeDefaultVersionWhenUnspecified = true;
-    options.ReportApiVersions = true;
-});
 
 builder.Services.AddControllers();
 
@@ -53,9 +46,9 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "FieldReservation API v1");
     });
-}
 
-app.UseDeveloperExceptionPage();
+    app.UseDeveloperExceptionPage();
+}
 
 app.UseMiddleware<GlobalExceptionHandler>();
 

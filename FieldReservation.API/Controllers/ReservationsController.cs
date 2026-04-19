@@ -1,15 +1,13 @@
 using FieldReservation.API.Common;
 using FieldReservation.Application.Reservations.Commands.CreateReservation;
 using FieldReservation.Application.Reservations.Queries.GetReservation;
-using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FieldReservation.API.Controllers;
 
-[Route("api/v{version:apiVersion}/[controller]")]
-[ApiVersion("1.0")]
+[Route("api/[controller]")]
 [Authorize]
 public class ReservationsController(ISender sender) : BaseApiController
 {
@@ -26,7 +24,7 @@ public class ReservationsController(ISender sender) : BaseApiController
         if (!result.IsSucceeded)
             return HandleResult<Guid>(result);
 
-        return CreatedAtAction(nameof(GetById), new { id = result.Value, version = "1.0" }, result.Value);
+        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
     }
 
     /// <summary>Gets a reservation by ID.</summary>

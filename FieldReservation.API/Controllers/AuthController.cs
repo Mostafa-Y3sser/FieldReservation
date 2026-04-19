@@ -1,5 +1,4 @@
 using MediatR;
-using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using FieldReservation.API.Common;
 using FieldReservation.Application.Auth.Commands.Login;
@@ -18,8 +17,7 @@ using FieldReservation.Application.Auth.Dtos;
 
 namespace FieldReservation.API.Controllers;
 
-[Route("api/v{version:apiVersion}/[controller]")]
-[ApiVersion("1.0")]
+[Route("api/[controller]")]
 [EnableRateLimiting("auth")]
 public class AuthController(ISender sender) : BaseApiController
 {
