@@ -1,10 +1,10 @@
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace FieldReservation.Application.Reservations.Commands.CreateReservation
+namespace FieldReservation.Application.Reservations.Commands.RescheduleReservation
 {
-    public class CreateReservationCommandValidator : AbstractValidator<CreateReservationCommand>
+    public class RescheduleReservationCommandValidator : AbstractValidator<RescheduleReservationCommand>
     {
-        public CreateReservationCommandValidator()
+        public RescheduleReservationCommandValidator()
         {
             RuleFor(x => x.StartTime)
                 .NotEmpty().WithMessage("Start time is required.")

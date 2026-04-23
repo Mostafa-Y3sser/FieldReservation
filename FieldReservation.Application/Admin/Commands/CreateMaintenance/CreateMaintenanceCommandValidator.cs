@@ -1,10 +1,10 @@
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace FieldReservation.Application.Reservations.Commands.CreateReservation
+namespace FieldReservation.Application.Admin.Commands.CreateMaintenance
 {
-    public class CreateReservationCommandValidator : AbstractValidator<CreateReservationCommand>
+    public class CreateMaintenanceCommandValidator : AbstractValidator<CreateMaintenanceCommand>
     {
-        public CreateReservationCommandValidator()
+        public CreateMaintenanceCommandValidator()
         {
             RuleFor(x => x.StartTime)
                 .NotEmpty().WithMessage("Start time is required.")
@@ -15,6 +15,10 @@ namespace FieldReservation.Application.Reservations.Commands.CreateReservation
                 .NotEmpty().WithMessage("End time is required.")
                 .GreaterThan(x => x.StartTime).WithMessage("End time must be after start time.")
                 .Must(endTime => endTime < DateTime.Now.AddDays(8)).WithMessage("End time exceeds the 7-day booking window.");
+
+            RuleFor(x => x.Note)
+                .NotEmpty().WithMessage("Note is required.")
+                .MaximumLength(150).WithMessage("Note cannot exceed 150 characters.");
         }
     }
 }

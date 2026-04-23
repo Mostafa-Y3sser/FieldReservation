@@ -6,16 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FieldReservation.Infrastructure.Persistence.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) 
+public class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<ApplicationUser>(options), IAppDbContext
 {
-    public DbSet<Reservation> Reservations => Set<Reservation>();
-    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Field> Fields { get; set; }
+    public DbSet<Reservation> Reservations { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
+
         builder.Entity<ApplicationUser>().ToTable("Users");
         builder.Entity<IdentityRole>().ToTable("Roles");
         builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
@@ -25,7 +26,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
 
         builder.Entity<RefreshToken>().HasIndex(rt => rt.Token).IsUnique();
-        
+
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }

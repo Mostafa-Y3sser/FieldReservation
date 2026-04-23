@@ -9,5 +9,8 @@ public class ApplicationUser : IdentityUser
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
+    // Navigation Properties
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+
+    public ICollection<Reservation>? Reservations { get; set; }
 }

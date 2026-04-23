@@ -2,9 +2,9 @@
 namespace FieldReservation.Application.Reservations.Queries.GetReservation
 {
     public record ReservationResponse(
-        Guid Id,
-        Guid FieldId,
-        Guid UserId,
+        Guid ReservationId,
+        string UserId,
         DateTime StartTime,
-        DateTime EndTime);
+        DateTime EndTime,
+        string Status);
 }

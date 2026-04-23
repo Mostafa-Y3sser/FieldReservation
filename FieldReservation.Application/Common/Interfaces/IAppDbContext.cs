@@ -5,6 +5,7 @@ namespace FieldReservation.Application.Common.Interfaces
 {
     public interface IAppDbContext
     {
+        DbSet<Field> Fields { get; }
         DbSet<Reservation> Reservations { get; }
         DbSet<RefreshToken> RefreshTokens { get; }
 

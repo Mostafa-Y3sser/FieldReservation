@@ -8,6 +8,7 @@ namespace FieldReservation.Application.Common.Results
         Unauthorized = 2,
         Validation = 3,
         Forbidden = 4,
-        InvalidCredentials = 5
+        InvalidCredentials = 5,
+        Conflict = 6
     }
 }
