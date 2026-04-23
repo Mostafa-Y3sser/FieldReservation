@@ -43,5 +43,10 @@ namespace FieldReservation.Application.Common.Results
             string code = "Error.InvalidCredentials",
             string description = "Invalid Credentials Provided")
             => new(code, description, ErrorType.InvalidCredentials);
+
+        public static Error Conflict(
+            string code = "Error.Conflict",
+            string description = "A Conflict Has Occurred")
+            => new(code, description, ErrorType.Conflict);
     }
 }

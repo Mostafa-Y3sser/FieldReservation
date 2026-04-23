@@ -53,6 +53,14 @@ namespace FieldReservation.Infrastructure.Persistence.Seeding
                     await userManager.AddToRoleAsync(owner, Roles.Owner);
                 }
             }
+
+            // 4. Seed Elite Turf Field
+            if (!await context.Fields.AnyAsync(f => f.Name == "Elite Turf"))
+            {
+                var field = Field.Create("Elite Turf", 100.00m); // Default hourly rate of 100
+                context.Fields.Add(field);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

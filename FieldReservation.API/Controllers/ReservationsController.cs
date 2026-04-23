@@ -1,6 +1,8 @@
 using FieldReservation.API.Common;
+using FieldReservation.Application.Reservations.Commands.CancelReservation;
 using FieldReservation.Application.Reservations.Commands.CreateReservation;
-using FieldReservation.Application.Reservations.Queries.GetReservation;
+using FieldReservation.Application.Reservations.Commands.RescheduleReservation;
+using FieldReservation.Application.Reservations.Queries.GetOccupiedPeriods;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,21 +22,43 @@ public class ReservationsController(ISender sender) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        
-        if (!result.IsSucceeded)
-            return HandleResult<Guid>(result);
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+        return HandleResult<Guid>(result);
     }
 
-    /// <summary>Gets a reservation by ID.</summary>
-    [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(ReservationResponse), StatusCodes.Status200OK)]
+    /// <summary>Cancels a reservation.</summary>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
     {
-        var result = await sender.Send(new GetReservationQuery(id), cancellationToken);
-        return HandleResult<ReservationResponse>(result);
+        var result = await sender.Send(new CancelReservationCommand(id), cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>Reschedules a reservation.</summary>
+    [HttpPatch("{id:guid}/reschedule")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Reschedule(
+        Guid id,
+        [FromBody] RescheduleReservationCommand command,
+        CancellationToken cancellationToken)
+    {
+        if (id != command.Id) return BadRequest("ID mismatch");
+        var result = await sender.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>Gets occupied periods for a date.</summary>
+    [HttpGet("occupied")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(List<OccupiedPeriodResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetOccupiedPeriods([FromQuery] DateTime date, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new GetOccupiedPeriodsQuery(date), cancellationToken);
+        return HandleResult(result);
     }
 }
 

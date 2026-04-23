@@ -13,6 +13,8 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 
 
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<FieldReservation.Application.Common.Interfaces.ICurrentUserService, FieldReservation.API.Services.CurrentUserService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

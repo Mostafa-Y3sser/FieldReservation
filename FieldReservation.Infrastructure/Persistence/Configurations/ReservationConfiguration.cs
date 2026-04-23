@@ -21,6 +21,19 @@ namespace FieldReservation.Infrastructure.Persistence.Configurations
 
             builder.Property(r => r.EndTime)
                 .IsRequired();
+
+            builder.Property(r => r.RowVersion)
+                .IsRowVersion();
+
+            builder.HasOne(r => r.Field)
+                .WithMany(f => f.Reservations)
+                .HasForeignKey(r => r.FieldId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(r => r.User)
+                .WithMany(u => u.Reservations)
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

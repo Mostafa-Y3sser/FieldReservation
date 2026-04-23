@@ -1,40 +1,58 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using FieldReservation.Domain.Entities;
-using FieldReservation.Application.Common.Results;
 using FieldReservation.Application.Common.Interfaces;
+using FieldReservation.Application.Common.Results;
+using FieldReservation.Domain.Entities;
+using FieldReservation.Domain.Enums;
 
 namespace FieldReservation.Application.Reservations.Commands.CreateReservation
 {
-
-    public sealed class CreateReservationCommandHandler(IAppDbContext dbContext)
+    public sealed class CreateReservationCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
         : IRequestHandler<CreateReservationCommand, Result<Guid>>
     {
-        public async Task<Result<Guid>> Handle(
-            CreateReservationCommand request,
-            CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(CreateReservationCommand request, CancellationToken cancellationToken)
         {
-            var hasConflict = await dbContext.Reservations
-                .AsNoTracking()
-                .AnyAsync(
-                    r => r.FieldId == request.FieldId &&
-                         r.StartTime < request.EndTime &&
-                         r.EndTime > request.StartTime,
+            var userId = currentUserService.UserId;
+            if (userId == null)
+                return Error.Unauthorized();
+
+            // 1. Fetch the single "Elite Turf" field
+            var field = await context.Fields
+                .FirstOrDefaultAsync(f => f.Name == "Elite Turf", cancellationToken);
+
+            if (field == null)
+                return Error.Failure(description: "The 'Elite Turf' field has not been initialized.");
+
+            // 2. Check for overlaps
+            var overlapExists = await context.Reservations
+                .AnyAsync(r =>
+                    r.FieldId == field.Id &&
+                    r.Status != ReservationStatus.Cancelled &&
+                    request.StartTime < r.EndTime &&
+                    request.EndTime > r.StartTime,
                     cancellationToken);
 
-            if (hasConflict)
-                return Error.Failure("Reservation.TimeConflict", "The field is already reserved for this time slot.");
+            if (overlapExists)
+                return Error.Conflict(description: "The requested time slot is already occupied.");
 
+            // 3. Create and Save
             var reservation = Reservation.Create(
-                request.FieldId,
-                request.UserId,
+                field.Id,
+                userId,
                 request.StartTime,
                 request.EndTime);
 
-            await dbContext.Reservations.AddAsync(reservation, cancellationToken);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            context.Reservations.Add(reservation);
 
-            return reservation.Id;
+            try
+            {
+                await context.SaveChangesAsync(cancellationToken);
+                return reservation.Id;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Error.Conflict(description: "The reservation could not be completed because the slot was booked by someone else.");
+            }
         }
     }
 }

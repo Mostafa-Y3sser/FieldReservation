@@ -66,6 +66,7 @@ namespace FieldReservation.API.Common
                 ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
                 ErrorType.InvalidCredentials => StatusCodes.Status401Unauthorized,
                 ErrorType.Forbidden => StatusCodes.Status403Forbidden,
+                ErrorType.Conflict => StatusCodes.Status409Conflict,
                 ErrorType.Failure => StatusCodes.Status500InternalServerError,
                 _ => StatusCodes.Status500InternalServerError
 
