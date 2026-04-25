@@ -663,6 +663,46 @@
 					]
 				}
 			]
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Stripe Webhook (Internal)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Stripe-Signature",
+								"value": "t=timestamp,v1=signature_hash",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"evt_123\",\n    \"type\": \"checkout.session.completed\",\n    \"data\": {\n        \"object\": {\n            \"id\": \"cs_test_...\",\n            \"payment_intent\": \"pi_3T...\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/payments/webhook",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"webhook"
+							]
+						},
+						"description": "This endpoint is called automatically by Stripe. Manually testing it via Postman requires generating a valid HMAC SHA256 Stripe-Signature."
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [
