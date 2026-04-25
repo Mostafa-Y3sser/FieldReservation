@@ -18,5 +18,7 @@ namespace FieldReservation.Application.Common.Interfaces
         Task<Result<AuthResponseDto>> GoogleSignUpAsync(string idToken);
         Task<Result<AuthResponseDto>> RefreshTokenAsync(string refreshToken);
         Task<Result> RevokeRefreshTokenAsync(string refreshToken);
+        Task<Result> BlockUserAsync(string userId);
+        Task<Result<List<UserDto>>> GetAllUsersAsync();
     }
 }

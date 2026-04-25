@@ -4,6 +4,8 @@ using FieldReservation.API.Middlewares;
 using FieldReservation.Application.Extentions;
 using FieldReservation.Infrastructure.Extensions;
 using FieldReservation.Infrastructure.Persistence.Seeding;
+using FieldReservation.Application.Common.Interfaces;
+using FieldReservation.API.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +16,7 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<FieldReservation.Application.Common.Interfaces.ICurrentUserService, FieldReservation.API.Services.CurrentUserService>();
+builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

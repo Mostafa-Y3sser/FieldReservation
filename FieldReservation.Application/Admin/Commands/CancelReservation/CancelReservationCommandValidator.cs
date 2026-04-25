@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace FieldReservation.Application.Admin.Commands.OverrideReservation
+namespace FieldReservation.Application.Admin.Commands.CancelReservation
 {
-    public class OverrideReservationCommandValidator : AbstractValidator<OverrideReservationCommand>
+    public class CancelReservationCommandValidator : AbstractValidator<CancelReservationCommand>
     {
-        public OverrideReservationCommandValidator()
+        public CancelReservationCommandValidator()
         {
             RuleFor(x => x.ReservationId)
                 .NotEmpty().WithMessage("Reservation ID is required.");

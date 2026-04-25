@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using FieldReservation.Application.Common.Results;
 using FieldReservation.Application.Common.Interfaces;
 using FieldReservation.Application.Common.Constants;
+using Microsoft.EntityFrameworkCore;
 
 namespace FieldReservation.Infrastructure.Services
 {
@@ -59,6 +60,9 @@ namespace FieldReservation.Infrastructure.Services
 
             var signInResult = await signInManager
                 .CheckPasswordSignInAsync(user, password, lockoutOnFailure: true);
+
+            if (signInResult.IsLockedOut)
+                return Error.Unauthorized(description: "Your account has been blocked by an administrator.");
 
             if (!signInResult.Succeeded)
                 return Error.InvalidCredentials(description: "Email or Password is incorrect.");
@@ -233,6 +237,39 @@ namespace FieldReservation.Infrastructure.Services
             await applicationDbContext.SaveChangesAsync();
 
             return Result.Ok();
+        }
+
+        public async Task<Result> BlockUserAsync(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+                return Error.NotFound(description: "User not found.");
+
+            // Set lockout end date to a far future date (e.g., 100 years from now)
+            var lockoutEndDate = DateTimeOffset.MaxValue;
+            var result = await userManager.SetLockoutEndDateAsync(user, lockoutEndDate);
+
+            if (!result.Succeeded)
+                return Error.Failure(description: string.Join(", ", result.Errors.Select(e => e.Description)));
+
+            return Result.Ok();
+        }
+
+        public async Task<Result<List<UserDto>>> GetAllUsersAsync()
+        {
+            var users = await userManager.Users.ToListAsync();
+            var userDtos = new List<UserDto>();
+
+            foreach (var user in users)
+            {
+                userDtos.Add(new UserDto(
+                    user.Id,
+                    user.FullName,
+                    user.Email ?? string.Empty,
+                    user.PhoneNumber));
+            }
+
+            return userDtos;
         }
 
         // Helper Methods

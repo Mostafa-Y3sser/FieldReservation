@@ -1,8 +1,7 @@
 {
 	"info": {
-		"_postman_id": "67041724-4f91-4565-8025-97645187740e",
+		"_postman_id": "field-reservation-api",
 		"name": "FieldReservation API",
-		"description": "Postman collection for FieldReservation API endpoints.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -16,7 +15,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"FirstName\": \"John\",\n    \"LastName\": \"Doe\",\n    \"Email\": \"john.doe@example.com\",\n    \"PhoneNumber\": \"+1234567890\",\n    \"Password\": \"Password123!\",\n    \"ConfirmPassword\": \"Password123!\"\n}",
+							"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phoneNumber\": \"+201234567890\",\n    \"password\": \"P@ssw0rd123\",\n    \"confirmPassword\": \"P@ssw0rd123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -39,26 +38,12 @@
 				},
 				{
 					"name": "Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = pm.response.json();",
-									"if (jsonData && jsonData.token) {",
-									"    pm.collectionVariables.set(\"token\", jsonData.token);",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"Email\": \"john.doe@example.com\",\n    \"Password\": \"Password123!\"\n}",
+							"raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"P@ssw0rd123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -86,7 +71,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"Email\": \"john.doe@example.com\"\n}",
+							"raw": "{\n    \"email\": \"john.doe@example.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -114,7 +99,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"Email\": \"john.doe@example.com\",\n    \"Token\": \"verification-token-here\"\n}",
+							"raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"token\": \"base64_encoded_token_here\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -142,7 +127,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"Email\": \"john.doe@example.com\"\n}",
+							"raw": "{\n    \"email\": \"john.doe@example.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -170,7 +155,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"Email\": \"john.doe@example.com\",\n    \"Token\": \"reset-token-here\",\n    \"NewPassword\": \"NewPassword123!\",\n    \"ConfirmNewPassword\": \"NewPassword123!\"\n}",
+							"raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"token\": \"base64_encoded_token_here\",\n    \"newPassword\": \"NewP@ssw0rd123\",\n    \"confirmNewPassword\": \"NewP@ssw0rd123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -198,7 +183,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"IdToken\": \"google-id-token-here\"\n}",
+							"raw": "{\n    \"idToken\": \"google_id_token_here\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -226,7 +211,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"IdToken\": \"google-id-token-here\"\n}",
+							"raw": "{\n    \"idToken\": \"google_id_token_here\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -254,7 +239,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"Token\": \"refresh-token-here\"\n}",
+							"raw": "{\n    \"refreshToken\": \"refresh_token_here\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -278,11 +263,21 @@
 				{
 					"name": "Revoke Refresh Token",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"Token\": \"refresh-token-here\"\n}",
+							"raw": "{\n    \"refreshToken\": \"refresh_token_here\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -309,38 +304,23 @@
 			"name": "Reservations",
 			"item": [
 				{
-					"name": "Get Occupied Periods",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/reservations/occupied?date=2023-10-27",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"reservations",
-								"occupied"
-							],
-							"query": [
-								{
-									"key": "date",
-									"value": "2023-10-27"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Create Reservation",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"StartTime\": \"2023-10-27T10:00:00Z\",\n    \"EndTime\": \"2023-10-27T11:00:00Z\"\n}",
+							"raw": "{\n    \"startTime\": \"2026-05-01T14:00:00Z\",\n    \"endTime\": \"2026-05-01T15:00:00Z\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -361,13 +341,58 @@
 					"response": []
 				},
 				{
+					"name": "Cancel Reservation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reservations/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reservations",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "uuid-here"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Reschedule Reservation",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"Id\": \"reservation-guid-here\",\n    \"StartTime\": \"2023-10-28T10:00:00Z\",\n    \"EndTime\": \"2023-10-28T11:00:00Z\"\n}",
+							"raw": "{\n    \"id\": \"uuid-here\",\n    \"startTime\": \"2026-05-01T16:00:00Z\",\n    \"endTime\": \"2026-05-01T17:00:00Z\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -375,14 +400,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/reservations/reservation-guid-here/reschedule",
+							"raw": "{{base_url}}/api/reservations/reschedule",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"reservations",
-								"reservation-guid-here",
 								"reschedule"
 							]
 						}
@@ -390,19 +414,25 @@
 					"response": []
 				},
 				{
-					"name": "Cancel Reservation",
+					"name": "Get Occupied Periods",
 					"request": {
-						"method": "DELETE",
+						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/reservations/reservation-guid-here",
+							"raw": "{{base_url}}/api/reservations/occupied?date=2026-05-01",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"reservations",
-								"reservation-guid-here"
+								"occupied"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2026-05-01"
+								}
 							]
 						}
 					},
@@ -414,105 +444,237 @@
 			"name": "Admin",
 			"item": [
 				{
-					"name": "Block Maintenance",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"StartTime\": \"2023-10-29T10:00:00Z\",\n    \"EndTime\": \"2023-10-29T11:00:00Z\",\n    \"Note\": \"Grass repair\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+					"name": "Reservations",
+					"item": [
+						{
+							"name": "Get All Reservations",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/admin/reservations",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"reservations"
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "{{base_url}}/api/admin/reservations/maintenance",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"reservations",
-								"maintenance"
-							]
+						{
+							"name": "Get Reservation By Id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/admin/reservations/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"reservations",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "uuid-here"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Maintenance",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"startTime\": \"2026-05-02T08:00:00Z\",\n    \"endTime\": \"2026-05-02T10:00:00Z\",\n    \"note\": \"Regular field maintenance\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/reservations/maintenance",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"reservations",
+										"maintenance"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Cancel Reservation",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"reservationId\": \"uuid-here\",\n    \"newStatus\": 2\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/reservations/cancel",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"reservations",
+										"cancel"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "Override Reservation",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"ReservationId\": \"reservation-guid-here\",\n    \"NewStatus\": 1\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+					"name": "Users",
+					"item": [
+						{
+							"name": "Get All Users",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/admin/users",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"users"
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "{{base_url}}/api/admin/reservations/reservation-guid-here/override",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"reservations",
-								"reservation-guid-here",
-								"override"
-							]
+						{
+							"name": "Block User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/admin/users/:id/block",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"users",
+										":id",
+										"block"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "user-id-here"
+										}
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				}
 			]
-		}
-	],
-	"auth": {
-		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "{{token}}",
-				"type": "string"
-			}
-		]
-	},
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
 		}
 	],
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:5000"
+			"value": "http://localhost:5000",
+			"type": "string"
 		},
 		{
 			"key": "token",
-			"value": ""
+			"value": "your_bearer_token_here",
+			"type": "string"
 		}
 	]
 }

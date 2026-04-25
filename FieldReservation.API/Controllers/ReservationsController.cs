@@ -37,16 +37,14 @@ public class ReservationsController(ISender sender) : BaseApiController
     }
 
     /// <summary>Reschedules a reservation.</summary>
-    [HttpPatch("{id:guid}/reschedule")]
+    [HttpPatch("reschedule")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Reschedule(
-        Guid id,
         [FromBody] RescheduleReservationCommand command,
         CancellationToken cancellationToken)
     {
-        if (id != command.Id) return BadRequest("ID mismatch");
         var result = await sender.Send(command, cancellationToken);
         return HandleResult(result);
     }
@@ -61,4 +59,3 @@ public class ReservationsController(ISender sender) : BaseApiController
         return HandleResult(result);
     }
 }
-

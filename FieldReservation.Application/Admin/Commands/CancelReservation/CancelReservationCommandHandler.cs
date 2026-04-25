@@ -4,12 +4,12 @@ using FieldReservation.Application.Common.Results;
 using Microsoft.EntityFrameworkCore;
 using FieldReservation.Domain.Enums;
 
-namespace FieldReservation.Application.Admin.Commands.OverrideReservation
+namespace FieldReservation.Application.Admin.Commands.CancelReservation
 {
-    public sealed class OverrideReservationCommandHandler(IAppDbContext context)
-        : IRequestHandler<OverrideReservationCommand, Result>
+    public sealed class CancelReservationCommandHandler(IAppDbContext context)
+        : IRequestHandler<CancelReservationCommand, Result>
     {
-        public async Task<Result> Handle(OverrideReservationCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(CancelReservationCommand request, CancellationToken cancellationToken)
         {
             var reservation = await context.Reservations
                 .FirstOrDefaultAsync(r => r.Id == request.ReservationId, cancellationToken);
