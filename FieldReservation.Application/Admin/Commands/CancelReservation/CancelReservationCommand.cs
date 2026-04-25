@@ -2,9 +2,9 @@
 using FieldReservation.Domain.Enums;
 using FieldReservation.Application.Common.Results;
 
-namespace FieldReservation.Application.Admin.Commands.OverrideReservation
+namespace FieldReservation.Application.Admin.Commands.CancelReservation
 {
-    public record OverrideReservationCommand(
+    public record CancelReservationCommand(
      Guid ReservationId,
      ReservationStatus NewStatus) : IRequest<Result>;
 }
