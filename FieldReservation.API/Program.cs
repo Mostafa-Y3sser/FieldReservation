@@ -43,8 +43,6 @@ var app = builder.Build();
 // Seed Database
 await DbInitializer.SeedAsync(app.Services);
 
-if (app.Environment.IsDevelopment())
-{
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
@@ -52,7 +50,7 @@ if (app.Environment.IsDevelopment())
     });
 
     app.UseDeveloperExceptionPage();
-}
+
 
 app.UseMiddleware<GlobalExceptionHandler>();
 
