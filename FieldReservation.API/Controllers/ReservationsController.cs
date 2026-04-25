@@ -13,16 +13,17 @@ namespace FieldReservation.API.Controllers;
 [Authorize]
 public class ReservationsController(ISender sender) : BaseApiController
 {
-    /// <summary>Creates a new reservation.</summary>
+    /// <summary>Creates a new reservation and returns a Stripe checkout URL for payment.</summary>
     [HttpPost]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(CreateReservationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create(
         [FromBody] CreateReservationCommand command,
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(command, cancellationToken);
-        return HandleResult<Guid>(result);
+        return HandleResult<CreateReservationResponse>(result);
     }
 
     /// <summary>Cancels a reservation.</summary>

@@ -21,6 +21,12 @@ namespace FieldReservation.Infrastructure.Services
             mimeMessage.Subject = subject;
             mimeMessage.Body = new BodyBuilder { HtmlBody = body }.ToMessageBody();
 
+            if (string.IsNullOrWhiteSpace(smtpSettings.UserName) || string.IsNullOrWhiteSpace(smtpSettings.Password))
+            {
+                Console.WriteLine($"[Mock Email] Sent to {toEmail} with subject: {subject}");
+                return;
+            }
+
             using SmtpClient client = new SmtpClient();
 
             try

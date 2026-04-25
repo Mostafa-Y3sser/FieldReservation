@@ -1,5 +1,6 @@
 using FieldReservation.Application.Common.Interfaces;
 using FieldReservation.Application.Interfaces;
+using FieldReservation.Application.Settings;
 using FieldReservation.Domain.Entities;
 using FieldReservation.Infrastructure.Persistence.Data;
 using FieldReservation.Infrastructure.Services;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Stripe;
 using System.Text;
 
 namespace FieldReservation.Infrastructure.Extensions
@@ -58,6 +60,12 @@ namespace FieldReservation.Infrastructure.Extensions
             services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
             services.Configure<SmtpSettings>(configuration.GetSection(nameof(SmtpSettings)));
             services.Configure<GoogleAuthSettings>(configuration.GetSection(nameof(GoogleAuthSettings)));
+            services.Configure<StripeSettings>(configuration.GetSection(nameof(StripeSettings)));
+            services.Configure<RefundPolicySettings>(configuration.GetSection(nameof(RefundPolicySettings)));
+
+            // Stripe global API key — must be set before any Stripe service call
+            var stripeSettings = configuration.GetSection(nameof(StripeSettings)).Get<StripeSettings>()!;
+            StripeConfiguration.ApiKey = stripeSettings.SecretKey;
 
             // Authentication
             services.AddAuthentication(options =>
@@ -108,7 +116,8 @@ namespace FieldReservation.Infrastructure.Extensions
             services.AddHttpContextAccessor();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ITokenService, FieldReservation.Infrastructure.Services.TokenService>();
+            services.AddScoped<IPaymentService, StripePaymentService>();
         }
     }
 }

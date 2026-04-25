@@ -373,3 +373,6 @@ PLAN.md
 
 specs/
 .env*
+
+# Ignore Production Settings
+appsettings.Production.json

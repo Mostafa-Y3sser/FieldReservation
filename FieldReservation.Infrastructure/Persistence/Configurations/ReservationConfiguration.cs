@@ -22,6 +22,17 @@ namespace FieldReservation.Infrastructure.Persistence.Configurations
             builder.Property(r => r.EndTime)
                 .IsRequired();
 
+            builder.Property(r => r.StripeSessionId)
+                .HasMaxLength(255)
+                .IsRequired(false);
+
+            builder.Property(r => r.StripePaymentIntentId)
+                .HasMaxLength(255)
+                .IsRequired(false);
+
+            // Index for fast webhook lookup by Stripe session ID
+            builder.HasIndex(r => r.StripeSessionId);
+
             builder.Property(r => r.RowVersion)
                 .IsRowVersion();
 

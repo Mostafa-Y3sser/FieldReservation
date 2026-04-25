@@ -1,0 +1,6 @@
+[4/25/2026 6:12:01 PM] Webhook received
+Signature verification failed: The expected signature was not found in the Stripe-Signature header. Make sure you're using the correct webhook secret (whsec_) and confirm the incoming request came from Stripe.
+Secret Used: whsec_30be4f7325e6d5944ec470f96330aa3e321d8acac631ba16dbe8d703f1bc2ed5
+[4/25/2026 6:12:05 PM] Webhook received
+Signature verification failed: The expected signature was not found in the Stripe-Signature header. Make sure you're using the correct webhook secret (whsec_) and confirm the incoming request came from Stripe.
+Secret Used: whsec_30be4f7325e6d5944ec470f96330aa3e321d8acac631ba16dbe8d703f1bc2ed5
