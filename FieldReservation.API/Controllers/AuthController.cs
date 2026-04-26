@@ -12,13 +12,11 @@ using FieldReservation.Application.Auth.Commands.RefreshToken;
 using FieldReservation.Application.Auth.Commands.ResetPassword;
 using FieldReservation.Application.Auth.Commands.RevokeRefreshToken;
 using FieldReservation.Application.Auth.Commands.SendEmailVerificationToken;
-using Microsoft.AspNetCore.RateLimiting;
 using FieldReservation.Application.Auth.Dtos;
 
 namespace FieldReservation.API.Controllers;
 
 [Route("api/[controller]")]
-[EnableRateLimiting("auth")]
 public class AuthController(ISender sender) : BaseApiController
 {
     [AllowAnonymous]

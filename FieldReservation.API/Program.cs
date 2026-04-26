@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi;
 using FieldReservation.API.Middlewares;
 using FieldReservation.Application.Extentions;
@@ -26,17 +25,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddProblemDetails();
 
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    options.AddFixedWindowLimiter("auth", options =>
-    {
-        options.AutoReplenishment = true;
-        options.PermitLimit = 5;
-        options.QueueLimit = 0;
-        options.Window = TimeSpan.FromMinutes(15);
-    });
-});
+
 
 var app = builder.Build();
 
@@ -58,7 +47,7 @@ app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
-app.UseRateLimiter();
+
 
 app.UseAuthentication();
 app.UseAuthorization();
