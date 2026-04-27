@@ -79,7 +79,7 @@ namespace FieldReservation.Infrastructure.Services
             string token = await userManager.GenerateEmailConfirmationTokenAsync(user);
             string encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-            string emailVerificationLink = $"https://Hagz.com/email-verification?email={email}&token={encodedToken}";
+            string emailVerificationLink = $"https://sportifywego.vercel.app/website/email-verification?email={email}&token={encodedToken}";
             string htmlBody = emailVerificationHtmlBody(emailVerificationLink);
 
             await emailService.SendEmailAsync(email, "Hagz - Email Verification", htmlBody);
@@ -114,7 +114,7 @@ namespace FieldReservation.Infrastructure.Services
             string token = await userManager.GeneratePasswordResetTokenAsync(user);
             string encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-            string forgotPasswordLink = $"https://Hagz.com/reset-password?email={email}&token={encodedToken}";
+            string forgotPasswordLink = $"https://sportifywego.vercel.app/website/reset-password?email={email}&token={encodedToken}";
             string htmlBody = forgetPasswordHtmlBody(forgotPasswordLink);
 
             await emailService.SendEmailAsync(email, "Hagz - Reset Password", htmlBody);
@@ -295,6 +295,7 @@ namespace FieldReservation.Infrastructure.Services
              new AuthResponseDto
             (
                 user.FullName,
+                userManager.GetRolesAsync(user).Result.FirstOrDefault() ?? string.Empty,
                 user.Email!,
                 await tokenService.CreateAccessTokenAsync(user),
                 await tokenService.CreateRefreshTokenAsync(user.Id),
