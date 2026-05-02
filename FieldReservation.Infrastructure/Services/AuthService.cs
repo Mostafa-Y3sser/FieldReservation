@@ -79,7 +79,7 @@ namespace FieldReservation.Infrastructure.Services
             string token = await userManager.GenerateEmailConfirmationTokenAsync(user);
             string encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-            string emailVerificationLink = $"https://sportifywego.vercel.app/website/email-verification?email={email}&token={encodedToken}";
+            string emailVerificationLink = $"https://sportifywego.vercel.app/email-verification?email={email}&token={encodedToken}";
             string htmlBody = emailVerificationHtmlBody(emailVerificationLink);
 
             await emailService.SendEmailAsync(email, "Hagz - Email Verification", htmlBody);
@@ -114,7 +114,7 @@ namespace FieldReservation.Infrastructure.Services
             string token = await userManager.GeneratePasswordResetTokenAsync(user);
             string encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-            string forgotPasswordLink = $"https://sportifywego.vercel.app/website/reset-password?email={email}&token={encodedToken}";
+            string forgotPasswordLink = $"https://sportifywego.vercel.app/reset-password?email={email}&token={encodedToken}";
             string htmlBody = forgetPasswordHtmlBody(forgotPasswordLink);
 
             await emailService.SendEmailAsync(email, "Hagz - Reset Password", htmlBody);
@@ -244,6 +244,9 @@ namespace FieldReservation.Infrastructure.Services
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
                 return Error.NotFound(description: "User not found.");
+
+            if (await userManager.IsInRoleAsync(user, Roles.Owner))
+                return Error.Validation(description: "Admin users cannot be blocked.");
 
             // Set lockout end date to a far future date (e.g., 100 years from now)
             var lockoutEndDate = DateTimeOffset.MaxValue;

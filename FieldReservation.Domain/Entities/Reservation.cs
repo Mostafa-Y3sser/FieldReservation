@@ -37,11 +37,12 @@ namespace FieldReservation.Domain.Entities
             };
         }
 
-        public static Reservation CreateMaintenance(Guid fieldId, DateTime startTime, DateTime endTime, string note)
+        public static Reservation CreateMaintenance(Guid fieldId, string userId, DateTime startTime, DateTime endTime, string note)
         {
             return new Reservation
             {
                 FieldId = fieldId,
+                UserId = userId,
                 StartTime = startTime,
                 EndTime = endTime,
                 Status = ReservationStatus.Maintenance,

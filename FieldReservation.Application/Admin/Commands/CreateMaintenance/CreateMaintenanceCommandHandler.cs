@@ -1,13 +1,15 @@
-using MediatR;
 using FieldReservation.Application.Common.Interfaces;
 using FieldReservation.Application.Common.Results;
 using FieldReservation.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using FieldReservation.Domain.Enums;
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace FieldReservation.Application.Admin.Commands.CreateMaintenance
 {
-    public sealed class CreateMaintenanceCommandHandler(IAppDbContext context)
+    public sealed class CreateMaintenanceCommandHandler(IAppDbContext context, IHttpContextAccessor httpContextAccessor)
         : IRequestHandler<CreateMaintenanceCommand, Result<Guid>>
     {
         public async Task<Result<Guid>> Handle(CreateMaintenanceCommand request, CancellationToken cancellationToken)
@@ -29,7 +31,7 @@ namespace FieldReservation.Application.Admin.Commands.CreateMaintenance
             if (overlapExists)
                 return Error.Conflict(description: "The maintenance slot overlaps with an existing reservation.");
 
-            var maintenance = Reservation.CreateMaintenance(field.Id, request.StartTime, request.EndTime, request.Note);
+            var maintenance = Reservation.CreateMaintenance(field.Id, httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier), request.StartTime, request.EndTime, request.Note);
             context.Reservations.Add(maintenance);
 
             try
