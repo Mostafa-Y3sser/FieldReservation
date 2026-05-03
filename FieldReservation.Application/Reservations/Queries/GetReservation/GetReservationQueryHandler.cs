@@ -17,6 +17,12 @@ namespace FieldReservation.Application.Reservations.Queries.GetReservation
             if (userId == null)
                 return Error.Unauthorized();
 
+            var user = await context.Users.AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+
+            if (user is null)
+                return Error.Unauthorized(description: "User not found.");
+
             var reservation = await context.Reservations
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.Id == request.ReservationId, cancellationToken);
@@ -28,8 +34,8 @@ namespace FieldReservation.Application.Reservations.Queries.GetReservation
                 return Error.Forbidden(description: "You do not have permission to access this reservation.");
 
             return new ReservationResponse(
-                reservation.Id,
-                reservation.UserId,
+                user.FullName,
+                user.Email!,
                 reservation.StartTime,
                 reservation.EndTime,
                 reservation.Status.ToString());

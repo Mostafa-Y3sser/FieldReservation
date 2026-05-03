@@ -33,7 +33,7 @@ namespace FieldReservation.Infrastructure.Persistence.Seeding
             }
 
             // 3. Seed Default Owner
-            var ownerEmail = "admin@gmail.com";
+            var ownerEmail = "mostafa@gmail.com";
             var existingOwner = await userManager.FindByEmailAsync(ownerEmail);
 
             if (existingOwner == null)
@@ -47,7 +47,7 @@ namespace FieldReservation.Infrastructure.Persistence.Seeding
                     CreatedAt = DateTime.Now
                 };
 
-                var result = await userManager.CreateAsync(owner, "Admin@123");
+                var result = await userManager.CreateAsync(owner, "Mostafa@123");
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(owner, Roles.Owner);

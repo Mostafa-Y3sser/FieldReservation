@@ -52,7 +52,6 @@ public class ReservationsController(ISender sender) : BaseApiController
 
     /// <summary>Gets occupied periods for a date.</summary>
     [HttpGet("occupied")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<OccupiedPeriodResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetOccupiedPeriods([FromQuery] DateTime date, CancellationToken cancellationToken)
     {

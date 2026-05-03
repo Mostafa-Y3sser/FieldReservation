@@ -36,7 +36,7 @@ namespace FieldReservation.Application.Reservations.Commands.RescheduleReservati
                 .AnyAsync(r =>
                     r.Id != reservation.Id &&
                     r.FieldId == reservation.FieldId &&
-                    r.Status != ReservationStatus.Cancelled &&
+                    (r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.Maintenance) &&
                     request.StartTime < r.EndTime &&
                     request.EndTime > r.StartTime,
                     cancellationToken);

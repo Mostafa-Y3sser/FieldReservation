@@ -23,7 +23,7 @@ namespace FieldReservation.Application.Admin.Commands.CreateMaintenance
             var overlapExists = await context.Reservations
                 .AnyAsync(r =>
                     r.FieldId == field.Id &&
-                    r.Status != ReservationStatus.Cancelled &&
+                     (r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.Maintenance) &&
                     request.StartTime < r.EndTime &&
                     request.EndTime > r.StartTime,
                     cancellationToken);
