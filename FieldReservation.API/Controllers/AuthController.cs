@@ -12,6 +12,7 @@ using FieldReservation.Application.Auth.Commands.RefreshToken;
 using FieldReservation.Application.Auth.Commands.ResetPassword;
 using FieldReservation.Application.Auth.Commands.RevokeRefreshToken;
 using FieldReservation.Application.Auth.Commands.SendEmailVerificationToken;
+using FieldReservation.Application.Auth.Queries.GetCurrentUser;
 using FieldReservation.Application.Auth.Dtos;
 
 namespace FieldReservation.API.Controllers;
@@ -137,5 +138,15 @@ public class AuthController(ISender sender) : BaseApiController
     {
         var result = await sender.Send(command, cancellationToken);
         return HandleResult(result);
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    [ProducesResponseType(typeof(UserProfileResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetMe(CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new GetCurrentUserQuery(), cancellationToken);
+        return HandleResult<UserProfileResponse>(result);
     }
 }

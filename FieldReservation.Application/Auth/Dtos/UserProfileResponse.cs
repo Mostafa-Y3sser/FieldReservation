@@ -1,9 +1,8 @@
 namespace FieldReservation.Application.Auth.Dtos;
 
-public record UserDto(
-    string Id,
+public record UserProfileResponse(
     string FullName,
     string Email,
     string? PhoneNumber,
-    bool IsBlocked
+    string UserName
 );

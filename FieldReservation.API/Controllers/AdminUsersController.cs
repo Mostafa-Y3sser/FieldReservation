@@ -1,6 +1,9 @@
 using FieldReservation.API.Common;
 using FieldReservation.Application.Admin.Commands.BlockUser;
+using FieldReservation.Application.Admin.Commands.UnblockUser;
+using FieldReservation.Application.Admin.Queries.GetAllReservations;
 using FieldReservation.Application.Admin.Queries.GetAllUsers;
+using FieldReservation.Application.Admin.Queries.GetUserReservations;
 using FieldReservation.Application.Common.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,6 +31,26 @@ namespace FieldReservation.API.Controllers
         {
             var result = await sender.Send(new BlockUserCommand(id), cancellationToken);
             return HandleResult(result);
+        }
+
+        [HttpPost("{id}/unblock")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UnblockUser(string id, CancellationToken cancellationToken)
+        {
+            var result = await sender.Send(new UnblockUserCommand(id), cancellationToken);
+            return HandleResult(result);
+        }
+
+        [HttpGet("{id}/reservations")]
+        [ProducesResponseType(typeof(List<ReservationDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetUserReservations(string id, CancellationToken cancellationToken)
+        {
+            var result = await sender.Send(new GetUserReservationsQuery(id), cancellationToken);
+            return HandleResult<List<ReservationDto>>(result);
         }
     }
 }

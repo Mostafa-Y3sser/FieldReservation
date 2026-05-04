@@ -18,7 +18,8 @@ public sealed class GetAllUsersQueryHandler(IAuthService authService)
             u.Id,
             u.FullName,
             u.Email,
-            u.PhoneNumber)).ToList();
+            u.PhoneNumber,
+            u.IsBlocked)).ToList();
 
         return userResponses;
     }

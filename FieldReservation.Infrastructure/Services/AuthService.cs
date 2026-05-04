@@ -258,6 +258,21 @@ namespace FieldReservation.Infrastructure.Services
             return Result.Ok();
         }
 
+        public async Task<Result> UnblockUserAsync(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+                return Error.NotFound(description: "User not found.");
+
+            // Reset lockout end date to null or a past date to unblock the user
+            var result = await userManager.SetLockoutEndDateAsync(user, null);
+
+            if (!result.Succeeded)
+                return Error.Failure(description: string.Join(", ", result.Errors.Select(e => e.Description)));
+
+            return Result.Ok();
+        }
+
         public async Task<Result<List<UserDto>>> GetAllUsersAsync()
         {
             var users = await userManager.Users.ToListAsync();
@@ -265,14 +280,29 @@ namespace FieldReservation.Infrastructure.Services
 
             foreach (var user in users)
             {
+                var isBlocked = user.LockoutEnd > DateTimeOffset.UtcNow;
                 userDtos.Add(new UserDto(
                     user.Id,
                     user.FullName,
                     user.Email ?? string.Empty,
-                    user.PhoneNumber));
+                    user.PhoneNumber,
+                    isBlocked));
             }
 
             return userDtos;
+        }
+
+        public async Task<Result<UserProfileResponse>> GetUserProfileAsync(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+                return Error.NotFound(description: "User not found.");
+
+            return new UserProfileResponse(
+                user.FullName,
+                user.Email ?? string.Empty,
+                user.PhoneNumber,
+                user.UserName ?? string.Empty);
         }
 
         // Helper Methods
