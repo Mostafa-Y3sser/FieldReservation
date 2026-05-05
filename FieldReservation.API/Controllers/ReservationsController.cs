@@ -2,6 +2,7 @@ using FieldReservation.API.Common;
 using FieldReservation.Application.Reservations.Commands.CancelReservation;
 using FieldReservation.Application.Reservations.Commands.CreateReservation;
 using FieldReservation.Application.Reservations.Commands.RescheduleReservation;
+using FieldReservation.Application.Reservations.Queries.GetMyReservations;
 using FieldReservation.Application.Reservations.Queries.GetOccupiedPeriods;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -57,5 +58,14 @@ public class ReservationsController(ISender sender) : BaseApiController
     {
         var result = await sender.Send(new GetOccupiedPeriodsQuery(date), cancellationToken);
         return HandleResult(result);
+    }
+
+    /// <summary>Gets all reservations for the current user.</summary>
+    [HttpGet("my-reservations")]
+    [ProducesResponseType(typeof(List<MyReservationResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetMyReservations(CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new GetMyReservationsQuery(), cancellationToken);
+        return HandleResult<List<MyReservationResponse>>(result);
     }
 }
