@@ -96,7 +96,7 @@ This project is built using **Clean Architecture** and **DDD (Domain-Driven Desi
    ```
 
 5. **Explore the API**:
-   Open `https://localhost:5001/swagger` to interact with the API via Swagger UI.
+   Open `https://sportify-m.runasp.net/swagger/index.html` to interact with the API via Swagger UI.
 
 ---
 
